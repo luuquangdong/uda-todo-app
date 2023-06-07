@@ -5,7 +5,7 @@ import middy from '@middy/core';
 import cors from '@middy/http-cors'
 import httpErrorHandler from '@middy/http-error-handler'
 
-import { updateTodoBLL, todoExists } from '../../helpers/todos'
+import { updateTodoBL } from '../../helpers/todos'
 import { UpdateTodoRequest } from '../../requests/UpdateTodoRequest'
 import { createLogger } from '../../utils/logger'
 import { getUserId } from '../utils'
@@ -20,17 +20,27 @@ export const handler = middy(
     // TODO: Update a TODO item with the provided id using values in the "updatedTodo" object
     logger.info(`Update TODO ${todoId}: ${event.body}`)
 
-    if(!todoExists(userId, todoId)) {
-      logger.info(`No TODO item has id ${todoId}`)
+    try {
+      await updateTodoBL(userId, todoId, updatedTodo)
+    } catch (error) {
+      if(error.message === 'TODO_NOT_FOUND') {
+        logger.info(`No TODO item has id ${todoId}`)
+        return {
+          statusCode: 404,
+          body: JSON.stringify({
+            error: 'Todo does not exist'
+          })
+        }
+      }
+
       return {
-        statusCode: 404,
+        statusCode: 500,
         body: JSON.stringify({
-          error: 'Todo does not exist'
+          error: 'Server error'
         })
       }
-    }
 
-    await updateTodoBLL(userId, todoId, updatedTodo)
+    }
 
     return {
       statusCode: 204,

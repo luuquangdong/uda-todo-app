@@ -4,7 +4,7 @@ import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
 import middy from '@middy/core';
 import cors from '@middy/http-cors'
 
-import { getTodosBLL } from '../../helpers/todos'
+import { getTodosBL } from '../../helpers/todos'
 import { getUserId } from '../utils';
 
 // TODO: Get all TODO items for a current user
@@ -13,7 +13,7 @@ export const handler = middy(
     
     const userId = getUserId(event)
 
-    const todos = await getTodosBLL(userId)
+    const todos = await getTodosBL(userId)
 
     return {
       statusCode: 200,

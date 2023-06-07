@@ -6,7 +6,7 @@ import cors from '@middy/http-cors'
 import httpErrorHandler from '@middy/http-error-handler'
 
 import { createLogger } from '../../utils/logger'
-import { generateUploadUrlBLL } from '../../helpers/todos'
+import { generateUploadUrlBL } from '../../helpers/todos'
 import { getUserId } from '../utils'
 
 const logger = createLogger('HTTP_PresignedUrl')
@@ -18,7 +18,7 @@ export const handler = middy(
     // TODO: Return a presigned URL to upload a file for a TODO item with the provided id
     logger.info(`Get presigned URL for TODO id ${todoId}`)
 
-    const presignedUrl = await generateUploadUrlBLL(userId, todoId)
+    const presignedUrl = await generateUploadUrlBL(userId, todoId)
 
     return {
       statusCode: 200,

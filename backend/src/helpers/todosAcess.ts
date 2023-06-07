@@ -15,7 +15,7 @@ const docClient = createDynamoDBClient()
 const logger = createLogger('TodosAccess')
 
 // TODO: Implement the dataLayer logic
-export async function getTodoByIdDAL(userId: string, todoId: string) : Promise<TodoItem> {
+export async function getTodoById(userId: string, todoId: string) : Promise<TodoItem | undefined> {
     logger.info(`get todo ${todoId}`)
     
     const result = await docClient.get({
@@ -27,7 +27,7 @@ export async function getTodoByIdDAL(userId: string, todoId: string) : Promise<T
     return result.Item as TodoItem
 }
 
-export async function getTodosByUserIdDAL(userId: string) : Promise<TodoItem[]> {
+export async function getTodosByUserId(userId: string) : Promise<TodoItem[]> {
     logger.info(`user ${userId} get todos`)
 
     const result = await docClient.query({
@@ -42,7 +42,7 @@ export async function getTodosByUserIdDAL(userId: string) : Promise<TodoItem[]> 
     return result.Items as TodoItem[]
 }
 
-export async function createTodoDAL(todo : TodoItem) : Promise<TodoItem> {
+export async function createTodo(todo : TodoItem) : Promise<TodoItem> {
     logger.info(`create todo ${JSON.stringify(todo)}`)
     
     await docClient.put({
@@ -53,7 +53,7 @@ export async function createTodoDAL(todo : TodoItem) : Promise<TodoItem> {
     return todo
 }
 
-export async function updateTodoDAL(userId: string, todoId: string, todo: TodoUpdate) {
+export async function updateTodo(userId: string, todoId: string, todo: TodoUpdate) {
     logger.info(`update todo ${todoId}: ${JSON.stringify(todo)}`)
 
     await docClient.update({
@@ -69,7 +69,7 @@ export async function updateTodoDAL(userId: string, todoId: string, todo: TodoUp
     }).promise()
 }
 
-export async function addAttachTodoDAL(userId:string, todoId: string, imageId: string) {
+export async function addAttachTodo(userId:string, todoId: string, imageId: string) {
     logger.info(`add attachment for TODO ${todoId} with imageId ${imageId}`)
 
     const imageUrl = `https://${ATTACHMENT_S3_BUCKET}.s3.amazonaws.com/${imageId}`
@@ -84,7 +84,7 @@ export async function addAttachTodoDAL(userId:string, todoId: string, imageId: s
     }).promise()
 }
 
-export async function deleteTodoDAL(userId: string, todoId: string) {
+export async function deleteTodo(userId: string, todoId: string) {
     logger.info(`delete todo ${todoId}`)
 
     await docClient.delete({

@@ -18,3 +18,10 @@ export function getUploadUrl(imageId: string) : string {
         Expires: SIGNED_URL_EXPIRATION
     })
 }
+
+export async function deleteImageFromS3(imageId: string) {
+    await s3.deleteObject({
+        Bucket: ATTACHMENT_S3_BUCKET,
+        Key: imageId
+    }).promise()
+}

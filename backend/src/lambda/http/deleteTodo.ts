@@ -6,7 +6,7 @@ import cors from '@middy/http-cors'
 import httpErrorHandler from '@middy/http-error-handler'
 
 import { createLogger } from '../../utils/logger'
-import { deleteTodoBLL, todoExists } from '../../helpers/todos'
+import { deleteTodoBL } from '../../helpers/todos'
 import { getUserId } from '../utils'
 
 const logger = createLogger('HTTP_DeleteTodo')
@@ -18,17 +18,27 @@ export const handler = middy(
     // TODO: Remove a TODO item by id
     logger.info(`Remove a TODO item by id ${todoId}`)
     
-    if(!todoExists(userId, todoId)) {
-      logger.info(`No TODO item has id ${todoId}`)
-      return {
-        statusCode: 404,
-        body: JSON.stringify({
-          error: 'Todo does not exist'
-        })
+    try {
+      await deleteTodoBL(userId, todoId)
+    } catch (err) {
+      if(err.message === 'TODO_NOT_FOUND') {
+        return {
+          statusCode: 404,
+          body: JSON.stringify({
+            error: 'Todo does not exist'
+          })
+        }
+      }
+
+      if(err.message === 'CANT_DELETE_TODO') {
+        return {
+          statusCode: 500,
+          body: JSON.stringify({
+            error: 'Server error'
+          })
+        }
       }
     }
-
-    await deleteTodoBLL(userId, todoId)
     
     return {
       statusCode: 204,

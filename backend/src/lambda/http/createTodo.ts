@@ -5,7 +5,7 @@ import cors from '@middy/http-cors'
 import { createLogger } from '../../utils/logger'
 import { CreateTodoRequest } from '../../requests/CreateTodoRequest'
 import { getUserId } from '../utils';
-import { createTodoBLL } from '../../helpers/todos'
+import { createTodoBL } from '../../helpers/todos'
 
 const logger = createLogger('HTTP_CreateTodo')
 
@@ -17,7 +17,7 @@ export const handler = middy(
     const newTodo: CreateTodoRequest = JSON.parse(event.body)
     const userId: string = getUserId(event)
 
-    const createdTodo = await createTodoBLL(newTodo, userId)
+    const createdTodo = await createTodoBL(newTodo, userId)
 
     return {
       statusCode: 201,
