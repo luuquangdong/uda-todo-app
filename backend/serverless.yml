@@ -176,8 +176,8 @@ resources:
             AttributeType: S
           - AttributeName: userId
             AttributeType: S
-          - AttributeName: dueDate
-            AttributeType: S
+          - AttributeName: done
+            AttributeType: N
         KeySchema:
           - AttributeName: userId
             KeyType: HASH
@@ -190,7 +190,7 @@ resources:
             KeySchema:
             - AttributeName: userId
               KeyType: HASH
-            - AttributeName: dueDate
+            - AttributeName: done
               KeyType: RANGE
             Projection:
               ProjectionType: ALL

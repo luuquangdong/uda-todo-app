@@ -11,7 +11,7 @@
       "type": "string"
     },
     "done": {
-      "type": "boolean"
+      "type": "number"
     }
   },
   "required": [

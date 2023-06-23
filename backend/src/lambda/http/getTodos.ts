@@ -12,14 +12,18 @@ export const handler = middy(
   async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
     
     const userId = getUserId(event)
+    const size = parseInt(event["queryStringParameters"]['size']) || 10
+    const filter = event["queryStringParameters"]['filter']
+    let startKey = event["queryStringParameters"]['lastKey']
+    if(startKey){
+      startKey = JSON.parse(decodeURIComponent(startKey))
+    }
 
-    const todos = await getTodosBL(userId)
+    const result = await getTodosBL(userId, size, filter, startKey)
 
     return {
       statusCode: 200,
-      body: JSON.stringify({
-        items: todos
-      })
+      body: JSON.stringify(result)
     }
   }
 )

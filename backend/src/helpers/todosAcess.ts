@@ -27,19 +27,46 @@ export async function getTodoById(userId: string, todoId: string) : Promise<Todo
     return result.Item as TodoItem
 }
 
-export async function getTodosByUserId(userId: string) : Promise<TodoItem[]> {
-    logger.info(`user ${userId} get todos`)
 
-    const result = await docClient.query({
-            TableName: TODOS_TABLE,
-            IndexName: TODOS_USER_ID_INDEX,
-            KeyConditionExpression: 'userId = :userId',
-            ExpressionAttributeValues: {
-                ':userId': userId
-            }
-        }).promise()
+export type GetTodosResType = {
+    items: TodoItem[]
+    lastKey: any
+}
+
+export async function getTodosByUserId(userId: string, size: number, filter: string, startKey: any) : Promise<GetTodosResType> {
+    logger.info(`user ${userId} get todos`)
+    let keyConditionExpress = 'userId = :userId'
+    const expressionAttributeValues = {
+        ':userId': userId
+    }
+
+    if(filter !== 'all'){
+        switch(filter){
+            case 'todo':
+                keyConditionExpress = `${keyConditionExpress} and done = :done`
+                expressionAttributeValues[':done'] = 0
+                break;
+            case 'done':
+                keyConditionExpress = `${keyConditionExpress} and done = :done`
+                expressionAttributeValues[':done'] = 1
+        }
+    }
+
+    const params = {
+        TableName: TODOS_TABLE,
+        IndexName: TODOS_USER_ID_INDEX,
+        KeyConditionExpression: keyConditionExpress,
+        ExpressionAttributeValues: expressionAttributeValues,
+        Limit: size,
+        ExclusiveStartKey: startKey
+    }
+
+    const result = await docClient.query(params).promise()
     
-    return result.Items as TodoItem[]
+    return {
+        items: result.Items as TodoItem[],
+        lastKey: result.LastEvaluatedKey
+    }
 }
 
 export async function createTodo(todo : TodoItem) : Promise<TodoItem> {
@@ -82,6 +109,8 @@ export async function addAttachTodo(userId:string, todoId: string, imageId: stri
             ':imageUrl' : imageUrl
         }
     }).promise()
+
+    return imageUrl
 }
 
 export async function deleteTodo(userId: string, todoId: string) {

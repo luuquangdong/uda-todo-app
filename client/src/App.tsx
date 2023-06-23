@@ -4,9 +4,9 @@ import { Grid, Menu, Segment } from 'semantic-ui-react'
 
 import Auth from './auth/Auth'
 import { EditTodo } from './components/EditTodo'
-import { LogIn } from './components/LogIn'
 import { NotFound } from './components/NotFound'
 import { Todos } from './components/Todos'
+import { LogIn } from './components/Login'
 
 export interface AppProps {}
 
@@ -36,13 +36,17 @@ export default class App extends Component<AppProps, AppState> {
   render() {
     return (
       <div>
-        <Segment style={{ padding: '8em 0em' }} vertical>
+        <Segment vertical>
           <Grid container stackable verticalAlign="middle">
+            { this.props.auth.isAuthenticated() && 
+              <Grid.Row>
+                <Grid.Column>
+                  {this.generateMenu()}
+                </Grid.Column>
+              </Grid.Row>}
             <Grid.Row>
               <Grid.Column width={16}>
                 <Router history={this.props.history}>
-                  {this.generateMenu()}
-
                   {this.generateCurrentPage()}
                 </Router>
               </Grid.Column>
@@ -55,30 +59,18 @@ export default class App extends Component<AppProps, AppState> {
 
   generateMenu() {
     return (
-      <Menu>
+      <Menu inverted>
         <Menu.Item name="home">
           <Link to="/">Home</Link>
         </Menu.Item>
 
-        <Menu.Menu position="right">{this.logInLogOutButton()}</Menu.Menu>
+        <Menu.Menu position="right">
+          <Menu.Item name="logout" color='blue' onClick={this.handleLogout}>
+            Log Out
+          </Menu.Item>
+        </Menu.Menu>
       </Menu>
     )
-  }
-
-  logInLogOutButton() {
-    if (this.props.auth.isAuthenticated()) {
-      return (
-        <Menu.Item name="logout" onClick={this.handleLogout}>
-          Log Out
-        </Menu.Item>
-      )
-    } else {
-      return (
-        <Menu.Item name="login" onClick={this.handleLogin}>
-          Log In
-        </Menu.Item>
-      )
-    }
   }
 
   generateCurrentPage() {

@@ -18,12 +18,13 @@ export const handler = middy(
     // TODO: Return a presigned URL to upload a file for a TODO item with the provided id
     logger.info(`Get presigned URL for TODO id ${todoId}`)
 
-    const presignedUrl = await generateUploadUrlBL(userId, todoId)
+    const { presignedUrl, imageUrl } = await generateUploadUrlBL(userId, todoId)
 
     return {
       statusCode: 200,
       body: JSON.stringify({
-        uploadUrl: presignedUrl
+        uploadUrl: presignedUrl,
+        imageUrl
       })
     }
   }

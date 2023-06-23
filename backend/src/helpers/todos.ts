@@ -1,4 +1,4 @@
-import { getTodosByUserId, createTodo, updateTodo, deleteTodo, addAttachTodo, getTodoById } from './todosAcess'
+import { getTodosByUserId, createTodo, updateTodo, deleteTodo, addAttachTodo, getTodoById, GetTodosResType } from './todosAcess'
 import { getUploadUrl, deleteImageFromS3 } from './attachmentUtils';
 import { TodoItem } from '../models/TodoItem'
 import { CreateTodoRequest } from '../requests/CreateTodoRequest'
@@ -10,8 +10,8 @@ import * as uuid from 'uuid'
 const logger = createLogger('TodoBussinessLogic')
 
 // TODO: Implement businessLogic
-export async function getTodosBL(userId: string) : Promise<TodoItem[]> {
-  return await getTodosByUserId(userId)
+export async function getTodosBL(userId: string, size: number, filter: string, lastTodoKey: any) : Promise<GetTodosResType> {
+  return await getTodosByUserId(userId, size, filter, lastTodoKey)
 }
 
 export async function createTodoBL(newTodo: CreateTodoRequest, userId: string) : Promise<TodoItem> {
@@ -21,7 +21,7 @@ export async function createTodoBL(newTodo: CreateTodoRequest, userId: string) :
     userId,
     todoId: uuid.v4(),
     createdAt: new Date().toISOString(),
-    done: false
+    done: 0
   })
 }
 
@@ -58,13 +58,13 @@ export async function updateTodoBL(userId: string, todoId: string, todo: UpdateT
   await updateTodo(userId, todoId, todo)
 }
 
-export async function generateUploadUrlBL(userId: string, todoId: string) : Promise<string> {
+export async function generateUploadUrlBL(userId: string, todoId: string) : Promise<any> {
   const imageId = uuid.v4()
 
-  await addAttachTodo(userId, todoId, imageId)
+  const imageUrl = await addAttachTodo(userId, todoId, imageId)
 
   const presignedUrl = getUploadUrl(imageId)
-  return presignedUrl
+  return { presignedUrl, imageUrl }
 }
 
 function getImageIdFromUrl(imageUrl: string): string {
